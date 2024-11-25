@@ -37,7 +37,7 @@ Email othmane@rumorz.io with "Rumorz API KEY" in the subject line.
 - **Tick-level time-series data**: get real-time amd historical sentiment data for all entities in the Graph
 - **Annotated news**: Get news articles related to any entity with sentiment and AI annotations
 - **Search**: search and find financial assets, companies or people in the Rumorz Graph
-- **Copilot**: An Agent with knowledge of the Rumorz SDK that can generate custom scripts for you
+- **Copilot**: An Agent with knowledge of the Rumorz Python package that can generate custom scripts for you
 
 ## 📚 Use cases
 
