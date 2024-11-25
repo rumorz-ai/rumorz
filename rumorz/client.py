@@ -1,15 +1,10 @@
 import os
 import traceback
 from enum import Enum
-from pathlib import Path
-from textwrap import dedent
 
 import litellm
 import pandas as pd
 import requests
-from litellm import completion
-from pydantic import BaseModel
-from pydantic import Field
 
 litellm.set_verbose = False
 

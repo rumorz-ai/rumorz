@@ -1,8 +1,8 @@
 [project]
-name = "rumorz"
-version = "0.1.13"
+name = "smartpy"
+version = "0.0.1"
 authors = [
-  { name="Othmane Zoheir", email="othmane@rumorz.io" },
+    { name = "Othmane Zoheir", email = "othmane@rumorz.io" },
 ]
 description = "Rumorz.io official Python SDK"
 readme = "README.md"
@@ -14,8 +14,11 @@ classifiers = [
 ]
 
 dependencies = [
-    "requests",
-    "smartpy @ git+https://github.com/zozoheir/smartpy.git@releases"
+    'pandas',
+    'numpy',
+    'psutil',
+    'requests',
+    'litellm'
 ]
 
 [project.urls]
