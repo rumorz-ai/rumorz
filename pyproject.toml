@@ -22,5 +22,5 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rumorz-ai/rumorz-sdk"
-Issues = "https://github.com/rumorz-ai/rumorz-sdk/issues"
+Homepage = "https://github.com/rumorz-ai/rumorz"
+Issues = "https://github.com/rumorz-ai/rumorz/issues"
