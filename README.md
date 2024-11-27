@@ -17,7 +17,7 @@ AI Agents read and analyze web data 24/7 and ingest 100s of pages of text a day 
 social and semantic analysis at state of the art performance.
 
 <p align="center">
-    <img src="https://github.com/user-attachments/assets/9f4c5a76-afa1-406a-bfad-d7ae07cb8c25" alt="tinyllm arc" width='500'>
+    <img src="https://github.com/rumorz-ai/rumorz/blob/main/docs/assets/architecture.png" alt="Rumorz architecture" width='500'>
 </p>
 
 
