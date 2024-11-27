@@ -1,6 +1,6 @@
 
 <p align="center">
-    <img src="https://svgur.com/i/18SB.svg" alt="Rumorz Logo" width="150"/>
+    <img src="https://i.postimg.cc/s2P93CGN/blue-logo-no-text-svg.png" alt="Rumorz Logo" width="150"/>
 </p>
 
 # 🚀 What is Rumorz?
