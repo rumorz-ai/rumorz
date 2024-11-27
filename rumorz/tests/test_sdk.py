@@ -4,7 +4,8 @@ import unittest
 
 from rumorz.client import RumorzClient
 
-rumorz = RumorzClient(api_key='0uiWflS2MtlfxxlrNsLclz34VUtbpHmnq1H9OdM4fos=', api_url='http://localhost:8000')
+rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'],
+                      api_url=os.environ.get('RUMORZ_API_URL', 'http://rumorz-api.eastus2.azurecontainer.io'))
 
 
 class TestRumorz(unittest.TestCase):

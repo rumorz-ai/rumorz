@@ -1,7 +1,9 @@
 import os
 from rumorz.client import RumorzClient
 import streamlit as st
-rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'], api_url='http://localhost:8000')
+
+rumorz = RumorzClient()
+
 data = rumorz.agent.get_state(id='36a5e6ba-160d-45bf-b28a-bea369e0136f')
 def get_logs(page, limit=10):
     return rumorz.agent.get_logs(agent_id='36a5e6ba-160d-45bf-b28a-bea369e0136f', page=page, limit=limit)
