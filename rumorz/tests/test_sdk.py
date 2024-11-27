@@ -4,8 +4,7 @@ import unittest
 
 from rumorz.client import RumorzClient
 
-rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'])
-                      #api_url='http://localhost:8000')
+rumorz = RumorzClient(api_key='0uiWflS2MtlfxxlrNsLclz34VUtbpHmnq1H9OdM4fos=')#, api_url='http://localhost:8000')
 
 
 class TestRumorz(unittest.TestCase):
@@ -46,9 +45,25 @@ class TestRumorz(unittest.TestCase):
 
     def test_get_ranking(self):
         screener = rumorz.graph.get_ranking(**{
-            "lookback": "1D"
+            "lookback": "1D",
+            "page": 1,
+            "limit": 10,
+            "sort_by": "mentions",
+            "entity_type": "financial_asset",
         })
         self.assertTrue(len(screener) > 0)
+
+    def test_limit_validation(self):
+        try:
+            rumorz.graph.get_ranking(**{
+                "lookback": "1D",
+                "page": 1,
+                "limit": 1000,
+                "sort_by": "mentions",
+                "entity_type": "financial_asset",
+            })
+        except Exception as e:
+            self.assertTrue("limit" in str(e).lower())
 
 
     def test_posts(self):

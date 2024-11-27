@@ -15,7 +15,6 @@ class RumorzAPIException(Exception):
 
 class RumorzClient:
     def __init__(self,
-                 copilot_model='azure/gpt-4o-mini',
                  api_key=os.environ['RUMORZ_API_KEY'],
                  api_url='http://rumorz-api.eastus2.azurecontainer.io'):
         self.api_url = api_url
@@ -25,25 +24,17 @@ class RumorzClient:
             'X-API-Key': api_key
         }
         self.graph = self.Graph(self)
-        self.agent = self.Agent(self,
-                                copilot_model)
+        self.agent = self.Agent(self)
 
     def call_function(self, function_name, params):
-        url = f"{self.api_url}/api/functions"
+        url = f"{self.api_url}/api/{function_name}"
         params = self._format_params(params)
-        payload = {
-            "function": function_name,
-            "params": params
-        }
-        response = requests.post(url, json=payload, headers=self.headers, timeout=30)
+        response = requests.post(url, json=params, headers=self.headers, timeout=30)
         try:
             response.raise_for_status()
             return response.json()['data']
-        except requests.exceptions.HTTPError as e:
-            if response.status_code == 500:
-                raise RumorzAPIException(response.json()['detail'])
-            else:
-                raise RumorzAPIException(traceback.format_exc())
+        except Exception as e:
+            raise RumorzAPIException(response.text)
 
     def _format_params(self, data):
         for key, value in data.items():
@@ -104,13 +95,17 @@ class RumorzClient:
 
 
     class Agent:
-        def __init__(self, api, copilot_model):
+        def __init__(self, api):
             self.api = api
-            self.copilot_model = copilot_model
 
         def get_entity_summary(self,
                                **kwargs):
             return self.api.call_function('get_entity_summary', params=kwargs)
 
+        def get_state(self,
+                      **kwargs):
+            return self.api.call_function('get_state', params=kwargs)
 
-
+        def get_logs(self,
+                     **kwargs):
+            return self.api.call_function('get_logs', params=kwargs)
