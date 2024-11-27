@@ -50,9 +50,9 @@ Email othmane@rumorz.io with "Rumorz API KEY" in the subject line.
 - Workflow automation: emails, PDFs, reports etc.
 
 # 🚀 Examples
-    * [Ask the Copilot to generate a custom script](docs/examples/copilot.py)
-    * [Various examples](docs/examples/examples.py)
-    * [Plot the sentiment scores of Bitcoin over time](docs/examples/bitcoin_sentiment.py)
+* [Ask the Copilot to generate a custom script](docs/examples/copilot.py)
+* [Various examples](docs/examples/examples.py)
+* [Plot the sentiment scores of Bitcoin over time](docs/examples/bitcoin_sentiment.py)
 
 
 ## FAQ
