@@ -4,7 +4,7 @@ import unittest
 
 from rumorz.client import RumorzClient
 
-rumorz = RumorzClient(api_key='0uiWflS2MtlfxxlrNsLclz34VUtbpHmnq1H9OdM4fos=')#, api_url='http://localhost:8000')
+rumorz = RumorzClient(api_key='0uiWflS2MtlfxxlrNsLclz34VUtbpHmnq1H9OdM4fos=', api_url='http://localhost:8000')
 
 
 class TestRumorz(unittest.TestCase):
@@ -50,6 +50,8 @@ class TestRumorz(unittest.TestCase):
             "limit": 10,
             "sort_by": "mentions",
             "entity_type": "financial_asset",
+            "scores_filter": 'mentions > 10',
+            "ascending": False
         })
         self.assertTrue(len(screener) > 0)
 
