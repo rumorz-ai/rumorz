@@ -10,7 +10,7 @@ rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'])
 
 bitcoin_node_id = '7d8d81b3-0808-47ce-b459-a9fd5f74fd57'
 
-df = rumorz.graph.get_entity_timeseries(**{
+df = rumorz.graph.get_metrics(**{
     "node_ids": [
         bitcoin_node_id
     ],
@@ -22,7 +22,7 @@ df = rumorz.graph.get_entity_timeseries(**{
     "page": 1,
     "limit": 100
 },
-                                        as_df=True)
+                                     as_df=True)
 
 fig = go.Figure()
 df = df[bitcoin_node_id]

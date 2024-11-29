@@ -1,4 +1,10 @@
+import datetime as dt
 from enum import Enum
+from typing import List, Tuple, Union
+
+import pandas as pd
+from pydantic import BaseModel
+
 
 class Lookback(Enum):
     ONE_HOUR = "1H"
@@ -24,6 +30,12 @@ class AssetClass(Enum):
     COMMODITIES = "commodities"
 
 
+class EntityMetricTransform(Enum):
+    LAST = 'last'
+    AVERAGE = 'average'
+    TICKS = 'ticks'
+
+
 class EntityMetrics(Enum):
     MENTIONS = 'mentions'
     SENTIMENT = 'sentiment'
@@ -33,3 +45,14 @@ class EntityMetrics(Enum):
     FEAR = 'fear'
     UNCERTAINTY = 'uncertainty'
     SURPRISE = 'surprise'
+
+class FinancialAssetMetrics(Enum):
+    PRICE = 'price'
+
+class SingleMetricTimeSeries(BaseModel):
+    metric: Union[EntityMetrics, FinancialAssetMetrics, str]
+    values: List[Tuple[str, float]]
+
+class TimeSeriesResponse(BaseModel):
+    entity_id: str
+    time_series: List[SingleMetricTimeSeries]

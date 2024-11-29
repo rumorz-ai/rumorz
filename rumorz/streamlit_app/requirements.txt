@@ -1,1 +1,2 @@
 rumorz
+streamlit-autorefresh

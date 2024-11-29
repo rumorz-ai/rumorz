@@ -1,44 +1,40 @@
 import datetime as dt
 import os
 import unittest
-
-from rumorz.client import RumorzClient
+from rumorz.client import RumorzClient, RumorzAPIException
+from rumorz.enums import AssetClass, EntityType, EntityMetrics, Lookback, EntityMetricTransform
 
 rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'],
-                      api_url=os.environ.get('RUMORZ_API_URL', 'http://rumorz-api.eastus2.azurecontainer.io'))
-
+                      api_url=os.environ.get('RUMORZ_API_URL', 'http://localhost:8000'))
 
 class TestRumorz(unittest.TestCase):
 
-
-    def test_search_entities(self):
+    @classmethod
+    def setUpClass(cls):
         entities = rumorz.graph.search_entities(**{
             "name": "Bitcoin",
-            "asset_class": "crypto",
-            "entity_type": "FinancialAsset",
+            "asset_class": AssetClass.CRYPTO,
+            "entity_type": EntityType.FINANCIAL_ASSET,
             "symbol_search": "BTC",
-            "limit": 10
+            "limit": 1
         })
-        self.assertTrue(len(entities) > 0)
+        assert len(entities) == 1, "Bitcoin entity search returned an unexpected number of results"
+        cls.bitcoin_entity_id = entities[0]['id']
 
     def test_time_series(self):
-        timeseries = rumorz.graph.get_entity_timeseries(**{
-            "node_ids": [
-                "7d8d81b3-0808-47ce-b459-a9fd5f74fd57"
-            ],
-            "metrics": [
-                "price",
-                "sentiment"
-            ],
-            "lookback": "3M",
+        timeseries = rumorz.graph.get_metrics(**{
+            "operation": EntityMetricTransform.LAST,
+            "ids": [self.bitcoin_entity_id],
+            "metrics":  [EntityMetrics.SENTIMENT, EntityMetrics.MENTIONS],
+            "lookback": Lookback.ONE_DAY,
             "page": 1,
             "limit": 100
         })
         self.assertTrue(len(timeseries) > 0)
 
     def test_entity_summary(self):
-        entity_update = rumorz.agent.get_entity_summary(**{
-            "node_id": "7d8d81b3-0808-47ce-b459-a9fd5f74fd57",
+        entity_update = rumorz.agent.summarize(**{
+            "id": self.bitcoin_entity_id,
             "timestamp": dt.datetime.utcnow().isoformat(),
             "scores_filter": "sentiment > 0.75"
         })
@@ -46,10 +42,10 @@ class TestRumorz(unittest.TestCase):
 
     def test_get_ranking(self):
         screener = rumorz.graph.get_ranking(**{
-            "lookback": "1D",
+            "lookback": Lookback.ONE_DAY,
             "page": 1,
             "limit": 10,
-            "sort_by": "mentions",
+            "sort_by": EntityMetrics.SENTIMENT,
             "entity_type": "financial_asset",
             "scores_filter": 'mentions > 10',
             "ascending": False
@@ -68,14 +64,26 @@ class TestRumorz(unittest.TestCase):
         except Exception as e:
             self.assertTrue("limit" in str(e).lower())
 
-
     def test_posts(self):
-        posts = rumorz.graph.get_entity_posts(**{
-            "node_ids": ["7d8d81b3-0808-47ce-b459-a9fd5f74fd57"],
-            "lookback": "30D",
+        posts = rumorz.graph.get_feed(**{
+            "ids": [self.bitcoin_entity_id],
+            "lookback": "3D",
             "scores_filter": "sentiment > 0.75",
             "page": 1,
             "limit": 10
         })
-
         self.assertTrue(len(posts) > 0)
+
+# <start_ignore>
+    def test_agent_state(self):
+        try:
+            rumorz.agent.get_state(id='xxxx')
+        except Exception as e:
+            self.assertTrue(isinstance(e, RumorzAPIException))
+
+    def test_agent_logs(self):
+        logs = rumorz.agent.get_logs(id='36a5e6ba-160d-45bf-b28a-bea369e0136f',
+                                     lookback="1D",
+                                     limit=10)
+        self.assertIsNotNone(logs)
+# <end_ignore>
