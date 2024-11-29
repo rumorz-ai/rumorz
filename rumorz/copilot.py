@@ -101,6 +101,7 @@ Description:\n{file_description}
 
         try:
             script_code = json.loads(response.choices[0].message.content)['file_content']
+            script_code = script_code.replace('```yaml', '').replace('```', '')
             with open(output_path, 'w') as f:
                 f.write(script_code)
         except Exception as e:

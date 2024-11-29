@@ -73,6 +73,8 @@ Generate a complete openai.yaml file with the following requirements:
 - Include the description of the endpoint under "description:"
 - You must include all enums 
 
+The final content should be enclosed within  ```yaml  ``` 
+
 <Example endpoint>
   /graph/get_feed:
     post:
