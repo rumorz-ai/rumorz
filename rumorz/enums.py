@@ -34,6 +34,7 @@ class EntityMetricTransform(Enum):
     LAST = 'last'
     AVERAGE = 'average'
     TICKS = 'ticks'
+    PRICE_SUMMARY = 'price_summary'
 
 
 class EntityMetrics(Enum):
@@ -51,8 +52,20 @@ class FinancialAssetMetrics(Enum):
 
 class SingleMetricTimeSeries(BaseModel):
     metric: Union[EntityMetrics, FinancialAssetMetrics, str]
-    values: List[Tuple[str, float]]
+    values: List[Tuple[Union[str,dt.datetime], float]]
 
 class TimeSeriesResponse(BaseModel):
     entity_id: str
     time_series: List[SingleMetricTimeSeries]
+
+class TimeSeriesResample(Enum):
+    ONE_MINUTE = '1T'
+    FIVE_MINUTES = '5T'
+    FIFTEEN_MINUTES = '15T'
+    THIRTY_MINUTES = '30T'
+    ONE_HOUR = '1H'
+    ONE_DAY = '1D'
+
+class TimeHorizon(Enum):
+    SHORT = 'short'
+    LONG = 'long'

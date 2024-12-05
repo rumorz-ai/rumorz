@@ -80,6 +80,14 @@ class RumorzClient:
                     dfs[node_ts['entity_id']] = df
                 return dfs
 
+        def get_price_stats(self,
+                            **kwargs):
+            """
+            Get summary price stats of a financial asset entity in the Rumorz Graph
+            """
+            return self.api.call_function('graph/get_price_stats', params=kwargs)
+
+
     class Agent:
         def __init__(self, api):
             self.api = api

@@ -27,6 +27,22 @@ social and semantic analysis at state of the art performance.
 pip install rumorz
 ```
 
+## 🚀  Vision
+Rumorz provides investors and traders their own AI agent, aligned with their goals and preferences and with 24/7 access to real-time, institutional grade financial data and analytics.
+
+
+## 🧠 How does it work?
+**The Graph**
+
+Our AI Agents ingest 100s of pages of text a day into a knowledge graph (the Graph), allowing fast semantic retrieval of market data and text data from news, research, social media. The Graph indexes data on 1200 crypto tokens in real-time, making it available to agents for research or decision making.
+
+This is ideal for AI use cases, and has been built from scratch without the constraints of legacy tables or complicated joins.
+
+**Agents**
+
+Agents are autonomous and run research and analysis for you 24/7. You don’t need to prompt them or think of questions to ask. You can simply give them a goal, and they will go from there. They will start doing research and analysis and come up with a strategy to achieve your goal.
+
+
 ## 🔒 API Access
 
 Email othmane@rumorz.io with "Rumorz API KEY" in the subject line.
@@ -50,40 +66,6 @@ Email othmane@rumorz.io with "Rumorz API KEY" in the subject line.
 - Workflow automation: emails, PDFs, reports etc.
 
 # 🚀 Examples
-* [Ask the Copilot to generate a custom script](docs/examples/copilot.py)
+* [Using the SDK Copilot to generate docs.rumorz.io](docs/examples/copilot.py)
 * [Various examples](docs/examples/examples.py)
 * [Plot the sentiment scores of Bitcoin over time](docs/examples/bitcoin_sentiment.py)
-
-
-## FAQ
-
-#### How do I get an API Key?
-Email othmane@rumorz.io with "Rumorz API KEY" in the subject line.
-
-#### How do I use the SDK Copilot?
-The Copilot uses litellm under the hood. Just set your provider's API key as an environment variable and instantiate a RumrozCopilot with your model name. Please refer to 
-the [litellm docs](https://docs.litellm.ai/docs/) for more information on 
-providers/model names and authentication.
-
-#### What are Rumorz's data sources? 
-We listen to 100s of news websites and sources from the web 24/7. 
-
-#### How does Rumorz leverage AI and Large Language Models (LLMs)?
-We use LLMs for indexing data, generating summaries, and extracting various sentiment scores. We also have an anomaly
-detection ML pipeline that helps us detect and filter out signal from noise to generate alerts
-
-#### What financial assets and entities does Rumorz track? 
-Rumorz tracks financial assets (crypto only for now), organizations, companies 
-and people on the web. 
-For now we're only tracking the crypto ecosystem but we plan to add US Stocks in the future as well.
-
-#### How are the sentiment scores generated?
-Using a combination of LLMs and NLP techniques.
-
-#### Are AI updates using real-time data? 
-Yes, any summary or update generated uses real-time data.
-
-#### Can I use the data for detecting investments or backtesting?
-Yes, the data can be used for backtesting and other analysis. Rumorz has been built with
-institutional grade quality in mind. 
-

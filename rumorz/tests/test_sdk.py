@@ -3,6 +3,7 @@ import os
 import unittest
 from rumorz.client import RumorzClient, RumorzAPIException
 from rumorz.enums import AssetClass, EntityType, EntityMetrics, Lookback, EntityMetricTransform
+from rumorz_backend.procedures.v0.graph.get_price_stats import TimeHorizon
 
 rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'],
                       api_url=os.environ.get('RUMORZ_API_URL', 'http://localhost:8000'))
@@ -64,7 +65,7 @@ class TestRumorz(unittest.TestCase):
         except Exception as e:
             self.assertTrue("limit" in str(e).lower())
 
-    def test_posts(self):
+    def test_get_feed(self):
         posts = rumorz.graph.get_feed(**{
             "ids": [self.bitcoin_entity_id],
             "lookback": "3D",
@@ -73,6 +74,15 @@ class TestRumorz(unittest.TestCase):
             "limit": 10
         })
         self.assertTrue(len(posts) > 0)
+
+    def test_get_price_stats(self):
+        summary = rumorz.graph.get_price_stats(**{
+            "id": self.bitcoin_entity_id,
+        })
+        print(summary)
+        self.assertTrue(len(summary) > 0)
+
+
 
 # <start_ignore>
     def test_agent_state(self):

@@ -1,44 +1,64 @@
 import datetime as dt
-
-from rumorz_llms.agents.autonomous_agent.rumorz_agent import RumorzAgent
-from smartpy.utility import dt_util
-from rumorz.client import RumorzClient
-import streamlit as st
-from streamlit_autorefresh import st_autorefresh
+import os
 from datetime import datetime, timedelta
-import asyncio
+
+import pandas as pd
+import streamlit as st
+from pydantic import BaseModel
+from streamlit_autorefresh import st_autorefresh
+
+from rumorz.client import RumorzClient
+from smartpy.utility import dt_util
+
+
 
 rumorz = RumorzClient(api_url="http://localhost:8000")
 
+import re
+
+def remove_enum_mentions(input: str) -> str:
+    return re.sub(r'(\w+)_([a-z])', lambda m: f"{m.group(1)} {m.group(2)}", input)
+
 def get_log_content(log):
+    ignore = ['FinishedCurrentTask']
     tools_emojis = {
+        "Reasoning": "🤔",
+        "UpdatePlan": "✅",
         "AlertUser": "👋",
-        "ThinkAndPlan": "🤔",
-        "ExecuteOrders": "🪙",
+        "Trader": "🗣️",
         "UpdateWatchlist": "📋",
-        "UpdateMemory": "🧠",
+        "UpdateMemory": "💾",
         "Sleep": "😴",
-        "GetTokensSocialRanking": "🌐",
-        "SearchEntities": "🔍",
-        "GetEntitySummaryUpdate": "📊"
+        "GetRealTimeUpdate": "🌐",
     }
     tool_descriptions = {
+        "Reasoning": "Thinking",
         "AlertUser": "Alerting user",
-        "ThinkAndPlan": "Thinking",
-        "ExecuteOrders": "Executing orders",
+        "UpdatePlan": "Ready to work",
+        "Trader": "Trading desk",
         "UpdateWatchlist": "Updating watchlist",
-        "UpdateMemory": "Updating brain",
-        "Sleep": "Sleeping",
-        "GetTokensSocialRanking": "Calling the Graph",
-        "SearchEntities": "Graph API",
-        "GetEntitySummaryUpdate": "Updating entity summary"
+        "UpdateMemory": "Updating memory",
+        "Sleep": "Waiting...",
+        "FinishedCurrentTask": "Subtask completed",
+        "GetRealTimeUpdate": "Querying Rumorz Graph",
     }
+
     content = None
     match log['tool_name']:
-        case 'ThinkAndPlan':
-            content = log['arguments']['reasoning']
-        case 'ExecuteOrders':
-            content = f"Executed order: {log['arguments']['order']}"
+        case 'GetRealTimeUpdate':
+            content = f"Fetching real-time updates for {log['arguments']}"
+        case 'Reasoning':
+            content = f"{log['arguments']['reasoning']}"
+        case 'UpdatePlan':
+            content = f""
+        case 'UpdateMemory':
+            content = f"updated {log['arguments']['key']}"
+        case 'Sleep':
+            content = f"{log['arguments']['message']}"
+        case 'AlertUser':
+            content = f"{log['arguments']['message']}"
+        case 'Trader':
+            content = f"message to the desk: {log['arguments']['message']}"
         case 'SearchEntities':
             content = f"Searching entities: {log['arguments']}"
         case 'GetTokensSocialRanking':
@@ -46,20 +66,30 @@ def get_log_content(log):
             content = f"Fetching Graph ranking by : {arguments}"
         case 'UpdateWatchlist':
             content = f"Updating Feed with: {log['arguments']}"
-        case 'UpdateMemory':
-            content = f"{log['arguments']['key']} updated to: \n {log['arguments']['value']}"
-        case 'Sleep':
-            content = f"{log['arguments']['reasoning']}"
-        case 'AlertUser':
-            content = f"{log['arguments']['message']}"
         case 'GetEntitySummaryUpdate':
             content = f"Entity summary update: {log['arguments']}"
+        case 'GetFeed':
+            content = f"Entity Feed: {log['arguments']}"
+        case 'GetPriceSummary':
+            content = f"Fetched price summary fpr {log['arguments']}"
+        case 'SendEmail':
+            content = "Sending email to your inbox"
 
     if content is None:
-        print(f"Unknown tool: {log['tool_name']}")
+        content = f""
+
+
+    content = content.replace('the missing fields', 'my memory',)
+    content = content.replace('memory.', '')
+
+
+
+    if log['tool_name'] in ignore:
+        return None
+
     return {
         "timestamp": log["timestamp"],
-        "content": f'<b style="color:white;">[ {tools_emojis.get(log['tool_name'], '🔧')} {tool_descriptions.get(log['tool_name'], "Performing action")} ]</b> {content}'
+        "content": f'<b style="color:white;">[ {tools_emojis.get(log["tool_name"], "🔧")} {tool_descriptions.get(log["tool_name"], log["tool_name"])} ]</b> {content}'
     }
 
 
@@ -130,6 +160,9 @@ st.markdown(
         max-height: 400px;
         overflow-y: auto;
     }
+    .padded-container {
+        padding: 25px;
+    }
     </style>
     """,
     unsafe_allow_html=True
@@ -147,9 +180,16 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-agent_id='fcbae6ae-acd9-4cfe-8a9e-cfbc1fe669a7'
+agent_id = 'fcbae6ae-acd9-4cfe-8a9e-cfbc1fe669a7'
 st.session_state.agent_id = agent_id
+
+
+def format_tool_calls(task):
+    markdowns = []
+    for tool_call in task['tool_calls']:
+        markdowns.append(f"[{tool_call['tool_name'].replace('functions.','')}] {task['title']}\n")
+    return markdowns
+
 
 if 'agent_id' in st.session_state:
     data = rumorz.agent.get_state(id=st.session_state.agent_id)
@@ -160,37 +200,38 @@ if 'agent_id' in st.session_state:
         limit=10,
         page=1
     )
-    st.session_state.logs = [get_log_content(log) for log in new_logs] + st.session_state.logs
+    st.session_state.logs = [get_log_content(log) for log in new_logs if log] + st.session_state.logs
     st.session_state.last_agent_refresh_timestamp = datetime.utcnow().isoformat()
-    
+
     brain = data['brain']
-    short_term_memory = brain.get("short_term_memory", {})
-    long_term_memory = brain.get("long_term_memory", {})
-    trading_strategy = long_term_memory.get("trading_strategy", "")
-    portfolio_summary = brain.get("portfolio_summary", {})
+    memory = brain.get("memory", {})
+    positioning = memory.get("positioning", "")
+    portfolio = brain.get("portfolio_summary", {})
     watch_list = brain.get("watch_list", {}).get("entities", [])
     session_start = brain.get("session_start", "N/A")
     session_duration = brain.get("session_duration", "N/A")
-    risk_tolerance = brain.get("risk_tolerance", "N/A")
+    risk_tolerance = memory.get("risk_tolerance", "N/A")
     initial_goal = brain.get("initial_goal", "N/A")
-    name = brain.get("name", "N/A")
+    name = data.get("name", "N/A")
     personality = brain.get("personality", "N/A")
+    plan = brain.get("plan", {}).get("tasks", [])
+
     st.markdown(
         f"""
         <div class="header">
             <img src="https://i.postimg.cc/wxbw3H3t/kai-avatar.png" alt="Kai" className="w-12 h-12 rounded-full mr-4" />
-            <div class="info">
-<h1>{name}</h1>
-        <p>Asset class: <span style="color:gray;">Cryptomarkets</span></p>
-        <p>Goal: <span style="color:gray;">{initial_goal}</span></p>
-        <p>Risk Tolerance: <span style="color:gray;">{risk_tolerance}</span></p>
-            </div>
+            <div class="info"> <h1>{name}</h1>
+        <p>Function: <span style="color:gray;">Portfolio Manager</span></p>
+        <p>Asset class: <span style="color:gray;">Digital Assets</span></p>
+        <p>Coverage: <span style="color:gray;">Bitcoin</span></p>
         </div>
         """.format(risk_tolerance),
         unsafe_allow_html=True
     )
-    # Add a Divider
+
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="padded-container">', unsafe_allow_html=True)
     col1, col2 = st.columns([1, 1])
     with col1:
         st.subheader("Activity")
@@ -198,12 +239,13 @@ if 'agent_id' in st.session_state:
         with st.container():
             st.markdown('<div class="scrollable-container">', unsafe_allow_html=True)
             for log in st.session_state.logs:
-                st.markdown(f'<div class="log-box">{log["content"]}</div>', unsafe_allow_html=True)
+                if log:
+                    st.markdown(f'<div class="log-box">{log["content"]}</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
         if st.button("Load more"):
             older_logs = rumorz.agent.get_logs(
-                agent_id=st.session_state.agent_id,
-                from_timestamp=str(dt_util.toDatetime(st.session_state.logs[-1]['timestamp'])-dt.timedelta(days=10)),
+                id=st.session_state.agent_id,
+                from_timestamp=str(dt_util.toDatetime(st.session_state.logs[-1]['timestamp']) - dt.timedelta(days=10)),
                 to_timestamp=str(st.session_state.logs[-1]['timestamp']),
                 limit=10,
                 page=st.session_state.page * 10
@@ -212,24 +254,27 @@ if 'agent_id' in st.session_state:
             st.session_state.page += 1
             st.rerun()
     with col2:
-        tabs = st.tabs(["Market conditions", "Trading strategy","Portfolio", "Tracked entities"])
+        tabs = st.tabs(["Profile", "Market summary", "Portfolio"])
         with tabs[0]:
-            st.markdown("**Short term**")
-            st.write(short_term_memory.get("market_conditions", ""))
-            st.markdown("**Long term**")
-            st.write(long_term_memory.get("market_conditions", ""))
-        with tabs[1]:
-            st.markdown(trading_strategy)
-        with tabs[2]:
-            st.subheader("Portfolio Summary")
-            st.write(f"Total PnL: {portfolio_summary.get('total_pnl', 0)}")
-            st.write("Last 5 Trades:")
-            for trade in portfolio_summary.get("last_5_trades", []):
-                st.write(trade)
-            st.write("PnL by Symbol:")
-            for symbol, pnl in portfolio_summary.get("pnl_by_symbol", {}).items():
-                st.write(f"{symbol}: {pnl}")
-        with tabs[3]:
-            for entity in watch_list:
-                st.write(entity)
+            st.write(f"- **Initial goal**:  50% monthly return")
+            st.write(f"- **Starting capital**: $100k")
+            st.write(f"- **Risk tolerance**: {risk_tolerance.lower().capitalize() if risk_tolerance else ''}")
 
+        with tabs[1]:
+            st.write(memory.get("market_conditions", ""))
+
+        with tabs[2]:
+            if type(portfolio) == dict:
+                st.subheader("Trades")
+                if 'trades' in portfolio:
+                    st.write(pd.DataFrame(portfolio['trades']).to_html(index=False), unsafe_allow_html=True)
+                st.subheader("Summary")
+                if 'summary' in portfolio:
+                    df = pd.DataFrame(list(portfolio['summary'].items()), columns=['stat', 'value'])
+                    st.write(df.to_html(index=False), unsafe_allow_html=True)
+
+            else:
+                st.write("No trades yet")
+
+
+    st.markdown('</div>', unsafe_allow_html=True)
