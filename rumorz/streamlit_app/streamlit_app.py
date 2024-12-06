@@ -173,7 +173,7 @@ st.markdown(
     <div class="header no-border">
         <img src="https://i.postimg.cc/s2P93CGN/blue-logo-no-text-svg.png" alt="Logo" />
         <div class="info">
-            <h1>rumorz.io</h1>
+            <h4>rumorz.io</h4>
         </div>
     </div>
     """,
@@ -254,16 +254,12 @@ if 'agent_id' in st.session_state:
             st.session_state.page += 1
             st.rerun()
     with col2:
-        tabs = st.tabs(["Profile", "Market summary", "Portfolio"])
-        with tabs[0]:
-            st.write(f"- **Initial goal**:  50% monthly return")
-            st.write(f"- **Starting capital**: $100k")
-            st.write(f"- **Risk tolerance**: {risk_tolerance.lower().capitalize() if risk_tolerance else ''}")
+        tabs = st.tabs(["Market summary", "Portfolio", "Profile"])
 
-        with tabs[1]:
+        with tabs[0]:
             st.write(memory.get("market_conditions", ""))
 
-        with tabs[2]:
+        with tabs[1]:
             if type(portfolio) == dict:
                 st.subheader("Trades")
                 if 'trades' in portfolio:
@@ -275,6 +271,11 @@ if 'agent_id' in st.session_state:
 
             else:
                 st.write("No trades yet")
+
+        with tabs[2]:
+            st.write(f"- **Initial goal**:  50% monthly return")
+            st.write(f"- **Starting capital**: $100k")
+            st.write(f"- **Risk tolerance**: {risk_tolerance.lower().capitalize() if risk_tolerance else ''}")
 
 
     st.markdown('</div>', unsafe_allow_html=True)

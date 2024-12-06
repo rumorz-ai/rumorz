@@ -3,10 +3,10 @@ import os
 import unittest
 from rumorz.client import RumorzClient, RumorzAPIException
 from rumorz.enums import AssetClass, EntityType, EntityMetrics, Lookback, EntityMetricTransform
-from rumorz_backend.procedures.v0.graph.get_price_stats import TimeHorizon
 
 rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'],
                       api_url=os.environ.get('RUMORZ_API_URL', 'http://localhost:8000'))
+
 
 class TestRumorz(unittest.TestCase):
 

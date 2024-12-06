@@ -54,6 +54,14 @@ class SingleMetricTimeSeries(BaseModel):
     metric: Union[EntityMetrics, FinancialAssetMetrics, str]
     values: List[Tuple[Union[str,dt.datetime], float]]
 
+    @property
+    def df(self):
+        df = pd.DataFrame(self.values, columns=['timestamp', getattr(self.metric, 'value', self.metric)])
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df.set_index('timestamp', inplace=True)
+        return df
+
+
 class TimeSeriesResponse(BaseModel):
     entity_id: str
     time_series: List[SingleMetricTimeSeries]
