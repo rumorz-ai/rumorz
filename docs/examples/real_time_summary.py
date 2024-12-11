@@ -10,7 +10,7 @@ rumorz_client = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'])
 print("Fetching top 2 people with the most positive sentiment in the last 7 days...")
 top_positive_people = rumorz_client.graph.get_ranking(
     lookback=Lookback.ONE_WEEK,
-    entity_type=EntityType.PERSON,
+    entity_type=EntityType.FINANCIAL_ASSET,
     sort_by=EntityMetrics.SENTIMENT,
     ascending=False,
     limit=2

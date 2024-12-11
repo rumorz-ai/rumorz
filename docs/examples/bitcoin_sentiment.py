@@ -7,11 +7,10 @@ from rumorz.client import RumorzClient
 from rumorz.enums import Lookback
 from rumorz_data.constants import RMZ_EMOTIONS
 
-rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'],
-                      api_url='http://localhost:8000')
+rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'])
 
 entities = rumorz.graph.search_entities(**{
-    "name": "Bitcoin",
+    "name_search": "Bitcoin",
     "symbol_search": "BTC",
     "limit": 1
 })
