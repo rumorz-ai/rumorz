@@ -51,6 +51,7 @@ class RumorzCopilot:
     def create_file(self,
                     file_description,
                     output_path,
+                    output_block=None,
                     include_client=True,
                     include_enums=True,
                     include_tests=True):
@@ -101,7 +102,7 @@ Description:\n{file_description}
 
         try:
             script_code = json.loads(response.choices[0].message.content)['file_content']
-            script_code = script_code.replace('```yaml', '').replace('```', '')
+            script_code = script_code.replace(f'```{output_block}', '').replace('```', '') if output_block else script_code
             with open(output_path, 'w') as f:
                 f.write(script_code)
         except Exception as e:

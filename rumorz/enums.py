@@ -5,6 +5,16 @@ from typing import List, Tuple, Union
 import pandas as pd
 from pydantic import BaseModel
 
+class EntityType(Enum):
+    FINANCIAL_ASSET = "financial_asset"
+    COMPANY = "company"
+    ORGANIZATION = "organization"
+    PERSON = "person"
+    PLACE = "place"
+
+class AssetClass(Enum):
+    CRYPTO = "crypto"
+    COMMODITIES = "commodities"
 
 class Lookback(Enum):
     ONE_HOUR = "1H"
@@ -14,27 +24,6 @@ class Lookback(Enum):
     ONE_WEEK = "7D"
     ONE_MONTH = "30D"
     THREE_MONTHS = "90D"
-
-
-class EntityType(Enum):
-    FINANCIAL_ASSET = "financial_asset"
-    COMPANY = "company"
-    ORGANIZATION = "organization"
-    PERSON = "person"
-    PLACE = "place"
-
-
-class AssetClass(Enum):
-    CRYPTO = "crypto"
-    COMMODITIES = "commodities"
-
-
-class EntityMetricTransform(Enum):
-    LAST = 'last'
-    AVERAGE = 'average'
-    TICKS = 'ticks'
-    PRICE_SUMMARY = 'price_summary'
-
 
 class EntityMetrics(Enum):
     MENTIONS = 'mentions'
@@ -48,6 +37,8 @@ class EntityMetrics(Enum):
 
 class FinancialAssetMetrics(Enum):
     PRICE = 'price'
+
+
 
 class SingleMetricTimeSeries(BaseModel):
     metric: Union[EntityMetrics, FinancialAssetMetrics, str]

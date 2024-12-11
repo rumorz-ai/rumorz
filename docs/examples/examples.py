@@ -1,37 +1,50 @@
 import os
-from datetime import datetime
+import datetime as dt
 from rumorz.client import RumorzClient
 from rumorz.enums import Lookback, EntityType, EntityMetrics
 
 
-# Initialize the RumorzClient
-rumorz_client = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'])
+def main():
+    api_key = os.environ['RUMORZ_API_KEY']
+    rumorz_client = RumorzClient(api_key=api_key)
 
-# Step 1: Get the entity rankings for people based on sentiment over the past 7 days.
-rankings = rumorz_client.graph.get_ranking(
-    lookback=Lookback.ONE_WEEK.value,
-    entity_type=EntityType.PERSON.value,
-    sort_by=EntityMetrics.SENTIMENT.value,
-    scores_filter='mentions > 10',
-    limit=10,
-    ascending=False
-)
-print("Entity rankings (top 10 people by sentiment in the last 7 days):", rankings)
-
-# Step 2: Identify the top 2 with the most positive sentiment and top 2 with the most negative sentiment
-sorted_rankings = sorted(rankings, key=lambda x: x['sentiment'], reverse=True)
-top_positive = sorted_rankings[:2]
-top_negative = sorted_rankings[-2:]
-
-# Step 3: Fetch summaries for these identified entities
-all_summaries = {}
-for entity in top_positive + top_negative:
-    summary = rumorz_client.agent.summarize(
-        id=entity['id'],
-        timestamp=datetime.utcnow().isoformat()
+    # Get the top 2 people with the most positive sentiment in the last 7 days
+    positive_sentiment_ranking = rumorz_client.graph.get_ranking(
+        lookback=Lookback.ONE_WEEK,
+        entity_type=EntityType.PERSON,
+        sort_by=EntityMetrics.SENTIMENT,
+        ascending=False,
+        limit=2
     )
-    all_summaries[entity['name']] = summary
-    print(f"Summary for {entity['name']}:", summary)
+    print("Top 2 people with the most positive sentiment:")
+    for entity in positive_sentiment_ranking:
+        print(entity)
 
-print("Script executed successfully with summaries obtained.")
+    # Get the top 2 people with the most negative sentiment in the last 7 days
+    negative_sentiment_ranking = rumorz_client.graph.get_ranking(
+        lookback=Lookback.ONE_WEEK,
+        entity_type=EntityType.PERSON,
+        sort_by=EntityMetrics.SENTIMENT,
+        ascending=True,
+        limit=2
+    )
+    print("\nTop 2 people with the most negative sentiment:")
+    for entity in negative_sentiment_ranking:
+        print(entity)
 
+    # Fetch and print summaries for these entities
+    print("\nSummaries for top entities:")
+    for ranking_list in [positive_sentiment_ranking, negative_sentiment_ranking]:
+        for entity in ranking_list:
+            summary = rumorz_client.agent.summarize(
+                id=entity['id'],
+                timestamp=dt.datetime.utcnow().isoformat()
+            )
+            print(f"Summary for {entity['name']}:")
+            print(summary)
+
+
+if __name__ == '__main__':
+    main()
+
+    print("\nScript execution completed successfully.")

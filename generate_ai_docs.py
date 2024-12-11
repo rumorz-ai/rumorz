@@ -10,7 +10,7 @@ from rumorz_backend.app import FUNCTION_REGISTRY
 from smartpy.utility import os_util
 from tinyllm.util.prompt_util import extract_function_signature
 
-EXAMPLES = False
+EXAMPLES = True
 OPENAPI = True
 ENUMS = True
 
@@ -65,16 +65,29 @@ if OPENAPI:
     # Get function signatures
 
     rumorz_copilot.create_file(
+        output_block="yaml",
         file_description=f"""
 Generate a complete openai.yaml file with the following requirements:
 - All endpoints should be documented as paths
 - put the name of the endpoint under "summary"
 - Use the provided function signatures for typing
-- server url is http://rumorz-api.eastus2.azurecontainer.io
+- server url is https://rumorz.azurewebsites.net/v0
 - Include the description of the endpoint under "description:"
 - You must include all enums
+- Make sure to include API key authentication
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+security:
+  - ApiKeyAuth: []
 
-The final content should be enclosed within  ```yaml  ``` 
+
+
+- The final content should be enclosed within  ```yaml  ``` 
+
 
 <Example endpoint>
   /graph/get_feed:
@@ -118,7 +131,28 @@ if ENUMS:
         file_description="""
 Generate a complete enums.mdx file with the following requirements:
 - All the Enums should be documented
+- Enum definitions should be enclosed within ```python ``` blocks
 - Use UI friendly, Production standard syntax and layouts
+
+Example enum documentation:
+
+## Lookback
+
+```python
+from enum import Enum
+
+class Lookback(Enum):
+    \"\"\"
+    Enum representing different lookback periods for data metrics.
+    \"\"\"
+    ONE_HOUR = "1H"
+    SIX_HOURS = "6H"
+    TWELVE_HOURS = "12H"
+    ONE_DAY = "1D"
+    ONE_WEEK = "7D"
+    ONE_MONTH = "30D"
+    THREE_MONTHS = "90D"
+```
     """,
         output_path=enums_path
     )

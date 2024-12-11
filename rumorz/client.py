@@ -17,7 +17,7 @@ class RumorzAPIException(Exception):
 class RumorzClient:
     def __init__(self,
                  api_key=os.environ['RUMORZ_API_KEY'],
-                 api_url='http://rumorz-api.eastus2.azurecontainer.io',
+                 api_url='https://rumorz.azurewebsites.net',
                  api_version='v0'):
         self.api_url = api_url
         self.api_version = api_version
@@ -92,27 +92,9 @@ class RumorzClient:
         def __init__(self, api):
             self.api = api
 
-        def create_agent(self,
-                         **kwargs):
-            """
-            Create an agent with a goal, name and personality
-            """
-            return self.api.call_function('agent/create_agent', params=kwargs)
-
         def summarize(self,
                       **kwargs):
             """
             Summarize events and news for any entity in the graph
             """
             return self.api.call_function('agent/summarize', params=kwargs)
-
-        def get_state(self,
-                      **kwargs):
-            """
-            Get the state of an agent. This includes current sentiment, personality, trading strategy, and more.
-            """
-            return self.api.call_function('agent/get_state', params=kwargs)
-
-        def get_logs(self,
-                     **kwargs):
-            return self.api.call_function('agent/get_logs', params=kwargs)
