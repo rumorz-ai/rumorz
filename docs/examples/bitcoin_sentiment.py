@@ -4,9 +4,11 @@ import plotly.graph_objects as go
 import plotly.io as pio
 
 from rumorz.client import RumorzClient
+from rumorz.enums import Lookback
 from rumorz_data.constants import RMZ_EMOTIONS
 
-rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'])
+rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'],
+                      api_url='http://localhost:8000')
 
 entities = rumorz.graph.search_entities(**{
     "name": "Bitcoin",
@@ -15,14 +17,12 @@ entities = rumorz.graph.search_entities(**{
 })
 assert len(entities) == 1, "Bitcoin entity search returned an unexpected number of results"
 bitcoin_node_id = entities[0]['id']
-df = rumorz.graph.get_metrics(**{
-    "ids": [
-        bitcoin_node_id
-    ],
-    "lookback": "90D",
-    "limit": 10000
-},
-                              as_df=True)
+df = rumorz.graph.get_metrics(
+    ids=[bitcoin_node_id],
+    lookback=Lookback.THREE_MONTHS,
+    limit=10000,
+    as_df=True
+)
 
 fig = go.Figure()
 df = df[bitcoin_node_id]
