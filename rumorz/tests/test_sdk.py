@@ -4,14 +4,14 @@ import unittest
 from rumorz.client import RumorzClient, RumorzAPIException
 from rumorz.enums import AssetClass, EntityType, EntityMetrics, Lookback, EntityMetricTransform
 
-rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'],
-                      api_url=os.environ.get('RUMORZ_API_URL', 'http://localhost:8000'))
+rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'])#,api_url=os.environ.get('RUMORZ_API_URL', 'http://localhost:8000'))
 
 
 class TestRumorz(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+
         entities = rumorz.graph.search_entities(**{
             "name": "Bitcoin",
             "asset_class": AssetClass.CRYPTO,
@@ -48,7 +48,6 @@ class TestRumorz(unittest.TestCase):
             "limit": 10,
             "sort_by": EntityMetrics.SENTIMENT,
             "entity_type": "financial_asset",
-            "scores_filter": 'mentions > 10',
             "ascending": False
         })
         self.assertTrue(len(screener) > 0)
@@ -69,7 +68,7 @@ class TestRumorz(unittest.TestCase):
         posts = rumorz.graph.get_feed(**{
             "ids": [self.bitcoin_entity_id],
             "lookback": "3D",
-            "scores_filter": "sentiment > 0.75",
+            "sentiment_gte": 0.5,
             "page": 1,
             "limit": 10
         })
@@ -81,7 +80,6 @@ class TestRumorz(unittest.TestCase):
         })
         print(summary)
         self.assertTrue(len(summary) > 0)
-
 
 
 # <start_ignore>

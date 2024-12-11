@@ -12,13 +12,14 @@ from tinyllm.util.prompt_util import extract_function_signature
 
 EXAMPLES = False
 OPENAPI = True
-ENUMS = False
+ENUMS = True
 
-examples_path = os_util.joinPaths(os_util.getCurrentDirPath(), 'docs/examples/example_script.py')
 
 rumorz_copilot = RumorzCopilot(model='azure/gpt-4o')
 
 if EXAMPLES:
+    examples_path = os_util.joinPaths([os_util.getCurrentDirPath(), 'docs/examples/examples.py'])
+
     # "Get the top 2 most positive and negative entities in the last day and get a summary for each"
     rumorz_copilot.create_file(
         file_description="""
@@ -71,7 +72,7 @@ Generate a complete openai.yaml file with the following requirements:
 - Use the provided function signatures for typing
 - server url is http://rumorz-api.eastus2.azurecontainer.io
 - Include the description of the endpoint under "description:"
-- You must include all enums 
+- You must include all enums
 
 The final content should be enclosed within  ```yaml  ``` 
 
@@ -95,7 +96,7 @@ The final content should be enclosed within  ```yaml  ```
                     type: string
                 lookback:
                   type: string
-                  enum: [1H, 6H, 12H, 1D, 7D, 30D, 90D, 365D]
+                  enum: [1H, 6H, 12H, 1D, 7D, 30D, 90D]
                   description: Time period to look back
                 scores_filter:
                   type: string

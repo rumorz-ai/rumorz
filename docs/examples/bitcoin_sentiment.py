@@ -6,23 +6,27 @@ import plotly.io as pio
 from rumorz.client import RumorzClient
 from rumorz_data.constants import RMZ_EMOTIONS
 
-rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'])
-
-bitcoin_node_id = '7d8d81b3-0808-47ce-b459-a9fd5f74fd57'
-
+rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'],
+                      api_url=os.environ.get('RUMORZ_API_URL', 'http://localhost:8000'))
+entities = rumorz.graph.search_entities(**{
+    "name": "Bitcoin",
+    "symbol_search": "BTC",
+    "limit": 1
+})
+assert len(entities) == 1, "Bitcoin entity search returned an unexpected number of results"
+bitcoin_node_id = entities[0]['id']
 df = rumorz.graph.get_metrics(**{
-    "node_ids": [
+    "ids": [
         bitcoin_node_id
     ],
     "metrics": [
         "price",
         "sentiment"
     ],
-    "lookback": "3M",
-    "page": 1,
-    "limit": 100
+    "lookback": "90D",
+    "limit": 10000
 },
-                                     as_df=True)
+                              as_df=True)
 
 fig = go.Figure()
 df = df[bitcoin_node_id]

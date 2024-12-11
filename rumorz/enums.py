@@ -14,7 +14,6 @@ class Lookback(Enum):
     ONE_WEEK = "7D"
     ONE_MONTH = "30D"
     THREE_MONTHS = "90D"
-    ONE_YEAR = "365D"
 
 
 class EntityType(Enum):
@@ -63,7 +62,7 @@ class SingleMetricTimeSeries(BaseModel):
 
 
 class TimeSeriesResponse(BaseModel):
-    entity_id: str
+    entity_id: int
     time_series: List[SingleMetricTimeSeries]
 
 class TimeSeriesResample(Enum):
