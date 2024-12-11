@@ -19,10 +19,6 @@ df = rumorz.graph.get_metrics(**{
     "ids": [
         bitcoin_node_id
     ],
-    "metrics": [
-        "price",
-        "sentiment"
-    ],
     "lookback": "90D",
     "limit": 10000
 },

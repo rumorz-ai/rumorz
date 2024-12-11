@@ -10,8 +10,8 @@ from rumorz_backend.app import FUNCTION_REGISTRY
 from smartpy.utility import os_util
 from tinyllm.util.prompt_util import extract_function_signature
 
-EXAMPLES = False
-OPENAPI = True
+EXAMPLES = True
+OPENAPI = False
 ENUMS = False
 
 

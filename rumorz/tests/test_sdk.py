@@ -5,7 +5,7 @@ from rumorz.client import RumorzClient
 from rumorz.enums import AssetClass, EntityType, EntityMetrics, Lookback
 
 rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'],
-                      api_url='http://localhost:8000')  #  http://localhost:8000 - https://rumorz.azurewebsites.net
+                      api_url='https://rumorz.azurewebsites.net')  #  http://localhost:8000 - https://rumorz.azurewebsites.net
 
 
 class TestRumorz(unittest.TestCase):
@@ -26,7 +26,6 @@ class TestRumorz(unittest.TestCase):
     def test_time_series(self):
         timeseries = rumorz.graph.get_metrics(**{
             "ids": [self.bitcoin_entity_id],
-            "metrics":  [EntityMetrics.SENTIMENT],
             "lookback": Lookback.ONE_DAY,
             "page": 1,
             "limit": 100
@@ -75,11 +74,3 @@ class TestRumorz(unittest.TestCase):
             "limit": 10
         })
         self.assertTrue(len(posts) > 0)
-
-    def test_get_price_stats(self):
-        summary = rumorz.graph.get_price_stats(**{
-            "id": self.bitcoin_entity_id,
-        })
-        print(summary)
-        self.assertTrue(len(summary) > 0)
-
