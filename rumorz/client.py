@@ -17,7 +17,7 @@ class RumorzAPIException(Exception):
 class RumorzClient:
     def __init__(self,
                  api_key=os.environ['RUMORZ_API_KEY'],
-                 api_url=os.environ.get('RUMORZ_API_URL', 'http://rumorz-api.eastus2.azurecontainer.io'),
+                 api_url='http://rumorz-api.eastus2.azurecontainer.io',
                  api_version='v0'):
         self.api_url = api_url
         self.api_version = api_version

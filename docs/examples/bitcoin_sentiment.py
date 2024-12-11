@@ -6,8 +6,8 @@ import plotly.io as pio
 from rumorz.client import RumorzClient
 from rumorz_data.constants import RMZ_EMOTIONS
 
-rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'],
-                      api_url=os.environ.get('RUMORZ_API_URL', 'http://localhost:8000'))
+rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'])
+
 entities = rumorz.graph.search_entities(**{
     "name": "Bitcoin",
     "symbol_search": "BTC",

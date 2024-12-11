@@ -3,6 +3,7 @@ from datetime import datetime
 from rumorz.client import RumorzClient
 from rumorz.enums import Lookback, EntityType, EntityMetrics
 
+
 # Initialize the RumorzClient
 rumorz_client = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'])
 
