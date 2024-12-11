@@ -10,9 +10,9 @@ from rumorz_backend.app import FUNCTION_REGISTRY
 from smartpy.utility import os_util
 from tinyllm.util.prompt_util import extract_function_signature
 
-EXAMPLES = True
+EXAMPLES = False
 OPENAPI = True
-ENUMS = True
+ENUMS = False
 
 
 rumorz_copilot = RumorzCopilot(model='azure/gpt-4o')
@@ -69,12 +69,14 @@ if OPENAPI:
         file_description=f"""
 Generate a complete openai.yaml file with the following requirements:
 - All endpoints should be documented as paths
-- put the name of the endpoint under "summary"
+- Put the name of the endpoint under "summary"
 - Use the provided function signatures for typing
 - server url is https://rumorz.azurewebsites.net/v0
 - Include the description of the endpoint under "description:"
 - You must include all enums
 - Make sure to include API key authentication
+- Use the endpoint test from the unit tests to generate examples for each path.
+
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -85,9 +87,8 @@ security:
   - ApiKeyAuth: []
 
 
-
 - The final content should be enclosed within  ```yaml  ``` 
-
+- Use the bitcoin_entity_id from test_sdk in the endpoint Call examples
 
 <Example endpoint>
   /graph/get_feed:
@@ -117,9 +118,17 @@ security:
                   type: integer
                 limit:
                   type: integer
+            example:
+              name_search: "Bitcoin"
+              symbol_search: "BTC"
+              asset_class: "crypto"
+              entity_type: "financial_asset"
+              page: 1
+              limit: 1
       responses:
         '200':
           description: Success
+          
 <End of Example endpoint>
 """,
         output_path=openai_yaml_path
@@ -142,9 +151,9 @@ Example enum documentation:
 from enum import Enum
 
 class Lookback(Enum):
-    \"\"\"
+    '''
     Enum representing different lookback periods for data metrics.
-    \"\"\"
+    '''
     ONE_HOUR = "1H"
     SIX_HOURS = "6H"
     TWELVE_HOURS = "12H"
@@ -156,3 +165,4 @@ class Lookback(Enum):
     """,
         output_path=enums_path
     )
+

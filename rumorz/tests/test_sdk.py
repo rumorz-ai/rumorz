@@ -5,7 +5,7 @@ from rumorz.client import RumorzClient
 from rumorz.enums import AssetClass, EntityType, EntityMetrics, Lookback
 
 rumorz = RumorzClient(api_key=os.environ['RUMORZ_API_KEY'],
-                      api_url='http://localhost:8000')#https://rumorz.azurewebsites.net
+                      api_url='http://localhost:8000')  #  http://localhost:8000 - https://rumorz.azurewebsites.net
 
 
 class TestRumorz(unittest.TestCase):
@@ -21,7 +21,7 @@ class TestRumorz(unittest.TestCase):
             "limit": 1
         })
         assert len(entities) == 1, "Bitcoin entity search returned an unexpected number of results"
-        cls.bitcoin_entity_id = entities[0]['id']
+        cls.bitcoin_entity_id = 115176#entities[0]['id']
 
     def test_time_series(self):
         timeseries = rumorz.graph.get_metrics(**{
@@ -57,10 +57,10 @@ class TestRumorz(unittest.TestCase):
         try:
             rumorz.graph.get_ranking(**{
                 "lookback": Lookback.THREE_MONTHS,
-                "page": 1,
-                "limit": 1000,
                 "sort_by": EntityMetrics.MENTIONS,
                 "entity_type": EntityType.FINANCIAL_ASSET,
+                "page": 1,
+                "limit": 1000,
             })
         except Exception as e:
             self.assertTrue("limit" in str(e).lower())
